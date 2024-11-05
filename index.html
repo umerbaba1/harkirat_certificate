@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Certificate Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <div class="container">
+        <h1>100xdevs Certificate Generator</h1>
+        
+        <div class="input-group">
+            <input type="text" id="nameInput" placeholder=" ">
+            <label for="nameInput">Enter Name</label>
+        </div>
+
+        <div class="input-group">
+            <input type="date" id="dateInput">
+            <label for="dateInput">Select Date</label>
+        </div>
+
+        <div class="button-group">
+            <button id="generateButton">Generate Certificate</button>
+            <button id="downloadBtn" style="display: none;">Download Certificate</button>
+        </div>
+
+        <div class="canvas-container">
+            <div class="demo-preview" id="demoPreview">
+                <img src="demo.png" alt="Sample Certificate" class="demo-image">
+                <div class="demo-overlay">
+                    <p>Enter your details above to generate your certificate</p>
+                </div>
+            </div>
+            <canvas id="certificateCanvas" style="display: none;"></canvas>
+        </div>
+    </div>
+    <script src="script.js"></script>
+  </body>
+</html>

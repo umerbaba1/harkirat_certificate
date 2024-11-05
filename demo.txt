@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Certificate Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <div class="container">
+        <h1>100xdevs Certificate Generator</h1>
+        
+        <div class="input-group">
+            <input type="text" id="nameInput" placeholder=" ">
+            <label for="nameInput">Enter Name</label>
+        </div>
+
+        <div class="input-group">
+            <input type="date" id="dateInput">
+            <label for="dateInput">Select Date</label>
+        </div>
+
+        <div class="button-group">
+            <button id="generateButton">Generate Certificate</button>
+            <button id="downloadBtn" style="display: none;">Download Certificate</button>
+        </div>
+
+        <div class="canvas-container">
+            <div class="demo-preview" id="demoPreview">
+            <canvas id="certificateCanvas"></canvas>
+        </div>
+    </div>
+    <script src="script.js"></script>
+  </body>
+</html>
+
+
+/* Modern CSS Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', Arial, sans-serif;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.container {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 2rem;
+    width: 100%;
+    max-width: 900px;
+    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+    transition: transform 0.3s ease;
+}
+
+.container:hover {
+    transform: translateY(-5px);
+}
+
+/* Stylish Header */
+h1 {
+    font-size: 2.5em;
+    color: #2d3436;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    position: relative;
+    padding-bottom: 15px;
+}
+
+h1::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 4px;
+    background: linear-gradient(90deg, #007bff, #00ff88);
+    border-radius: 2px;
+}
+
+/* Modern Input Styling */
+.input-group {
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+input[type="text"],
+input[type="date"] {
+    width: 100%;
+    padding: 12px 20px;
+    font-size: 1rem;
+    border: 2px solid #e1e1e1;
+    border-radius: 10px;
+    background: white;
+    transition: all 0.3s ease;
+}
+
+input:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+}
+
+/* Floating Labels */
+.input-group label {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: white;
+    padding: 0 5px;
+    color: #666;
+    transition: all 0.3s ease;
+    pointer-events: none;
+}
+
+.input-group input:focus + label,
+.input-group input:not(:placeholder-shown) + label {
+    top: 0;
+    font-size: 0.8rem;
+    color: #007bff;
+}
+
+/* Button Styling */
+.button-group {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
+}
+
+button {
+    padding: 12px 30px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+#generateButton {
+    background: linear-gradient(45deg, #007bff, #00ff88);
+    color: white;
+}
+
+#downloadBtn {
+    background: linear-gradient(45deg, #28a745, #20c997);
+    color: white;
+}
+
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+/* Canvas Container Styling */
+.canvas-container {
+    margin-top: 2rem;
+    padding: 1rem;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+#certificateCanvas {
+    width: 100%;
+    max-width: 800px;
+    height: auto;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+/* Loading Animation */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loading {
+    position: relative;
+    opacity: 0.7;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #007bff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        padding: 1.5rem;
+    }
+
+    h1 {
+        font-size: 2em;
+    }
+
+    .button-group {
+        flex-direction: column;
+    }
+
+    button {
+        width: 100%;
+    }
+}
+
+/* Success Message Animation */
+@keyframes slideIn {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.success-message {
+    background: #d4edda;
+    color: #155724;
+    padding: 1rem;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+    animation: slideIn 0.3s ease forwards;
+}
+
+/* Notification Styling */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    max-width: 350px;
+    background: white;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    animation: slideInRight 0.5s ease forwards;
+}
+
+.notification-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.notification.info {
+    border-left: 4px solid #007bff;
+}
+
+.notification.error {
+    border-left: 4px solid #dc3545;
+}
+
+.notification-message {
+    flex: 1;
+    font-size: 0.9rem;
+    color: #444;
+    line-height: 1.4;
+}
+
+.notification-close {
+    background: none;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    font-size: 1.2rem;
+    padding: 0 5px;
+    transition: color 0.3s ease;
+}
+
+.notification-close:hover {
+    color: #333;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOutRight {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+/* Media query for mobile devices */
+@media (max-width: 768px) {
+    .notification {
+        top: auto;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 90%;
+        max-width: 320px;
+        margin: 0 auto;
+        right: auto;
+    }
+
+    @keyframes slideInRight {
+        from {
+            transform: translate(-50%, 100%);
+            opacity: 0;
+        }
+        to {
+            transform: translate(-50%, 0);
+            opacity: 1;
+        }
+    }
+
+    .notification-message {
+        font-size: 0.85rem;
+    }
+}
+
+/* Extra small devices */
+@media (max-width: 320px) {
+    .notification {
+        width: 95%;
+        padding: 12px;
+    }
+
+    .notification-message {
+        font-size: 0.8rem;
+    }
+}
+  
+
+  function generateCertificate() {
+    const name = document.getElementById("nameInput").value;
+    const canvas = document.getElementById("certificateCanvas");
+    const ctx = canvas.getContext("2d");
+
+    // Load the certificate background image
+    const img = new Image();
+    img.src = "certificate.png";  // Replace with your certificate image path
+
+    img.onload = function() {
+        // Set canvas size to match the image dimensions
+        canvas.width = img.width;
+        canvas.height = img.height;
+
+        // Draw the background image at its original resolution
+        ctx.drawImage(img, 0, 0, img.width, img.height);
+        
+        // Set the text properties
+        ctx.font = "700 90px 'Dancing Script', cursive";
+        ctx.fillStyle = "black";  // Adjust color based on your certificate design
+        ctx.textAlign = "center";
+        
+        // Position the text
+        const textX = canvas.width / 2; // Center of canvas width
+        const textY = canvas.height * 0.53; // Approximate position (adjust as needed)
+
+        // Draw the name on the certificate
+        ctx.fillText(name, textX, textY);
+        
+        // Set the text properties for the date
+        ctx.font = "400 35px 'Arial' ";
+        ctx.textAlign = "left"; // Align text to the left
+
+        // Get the date value
+        const dateInput = document.getElementById('dateInput');
+        const selectedDate = new Date(dateInput.value);
+
+        // Format the date (DD/MM/YYYY)
+        const formattedDate = selectedDate.getDate().toString().padStart(2, '0') + '/' +
+                              (selectedDate.getMonth() + 1).toString().padStart(2, '0') + '/' +
+                              selectedDate.getFullYear();
+
+        // Position the date text
+        const dateX = 385;
+        const dateY = 1330;
+        ctx.fillText(formattedDate, dateX, dateY);
+    };
+
+    // Show the download button after certificate is generated
+    const downloadBtn = document.getElementById('downloadBtn');
+    downloadBtn.style.display = 'block';
+}
+
+// Add download button functionality
+document.getElementById('downloadBtn').addEventListener('click', async function() {
+    const button = this;
+    button.disabled = true;
+    button.textContent = 'Downloading...';
+    
+    try {
+        const link = document.createElement('a');
+        const canvas = document.getElementById('certificateCanvas');
+        const dataURL = canvas.toDataURL('image/png');
+        
+        link.download = '100xdevs.png';
+        link.href = dataURL;
+        
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    } catch (error) {
+        console.error('Download failed:', error);
+        alert('Download failed. Please try again.');
+    } finally {
+        button.disabled = false;
+        button.textContent = 'Download Certificate';
+    }
+});
+
+// Add loading states
+function showLoading(button) {
+    button.disabled = true;
+    button.classList.add('loading');
+    const originalText = button.textContent;
+    button.textContent = 'Processing...';
+    return () => {
+        button.disabled = false;
+        button.classList.remove('loading');
+        button.textContent = originalText;
+    };
+}
+
+// Add success message
+function showSuccess(message) {
+    const successDiv = document.createElement('div');
+    successDiv.className = 'success-message';
+    successDiv.textContent = message;
+    document.querySelector('.container').insertBefore(successDiv, document.querySelector('.canvas-container'));
+    setTimeout(() => successDiv.remove(), 3000);
+}
+
+// Update your existing event listeners
+document.getElementById('generateButton').addEventListener('click', async function() {
+    const resetLoading = showLoading(this);
+    try {
+        await generateCertificate();
+        showSuccess('Certificate generated successfully!');
+        document.getElementById('downloadBtn').style.display = 'block';
+    } catch (error) {
+        console.error(error);
+        alert('Failed to generate certificate. Please try again.');
+    } finally {
+        resetLoading();
+    }
+});
+
+// Add this function to show notifications
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.innerHTML = `
+        <div class="notification-content">
+            <span class="notification-message">${message}</span>
+            <button class="notification-close">&times;</button>
+        </div>
+    `;
+    
+    document.body.appendChild(notification);
+
+    // Add close button functionality
+    notification.querySelector('.notification-close').addEventListener('click', () => {
+        notification.remove();
+    });
+
+    // Auto-remove after 10 seconds
+    setTimeout(() => {
+        notification.remove();
+    }, 10000);
+}
+
+// Add this to your window load event
+window.addEventListener('load', () => {
+    showNotification(
+        "Note: If the certificate text appears in a basic font, please refresh your browser to load the stylized font correctly.",
+        'info'
+    );
+});
+
+
